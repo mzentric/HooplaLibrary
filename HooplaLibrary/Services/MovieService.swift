@@ -3,6 +3,11 @@ import Combine
 
 class MovieService: MovieServiceProtocol {
     private let baseURL = "https://patron-api-gateway.hoopladigital.com/graphql"
+    private let networkService: NetworkService
+    
+    init(networkService: NetworkService = NetworkService()) {
+        self.networkService = networkService
+    }
     
     func fetchMovies() -> AnyPublisher<[Movie], Error> {
         guard let url = URL(string: baseURL) else {
@@ -12,7 +17,7 @@ class MovieService: MovieServiceProtocol {
         var request = URLRequest(url: url)
         request.httpMethod = "POST"
         
-        // Required headers from the browser request
+        // Required headers
         request.addValue("application/json", forHTTPHeaderField: "Content-Type")
         request.addValue("*/*", forHTTPHeaderField: "Accept")
         request.addValue("hoopla-www", forHTTPHeaderField: "apollographql-client-name")
@@ -37,33 +42,10 @@ class MovieService: MovieServiceProtocol {
             return Fail(error: error).eraseToAnyPublisher()
         }
         
-        return URLSession.shared
-            .dataTaskPublisher(for: request)
-            .tryMap { data, response in
-                if let httpResponse = response as? HTTPURLResponse {
-                    print("Response Status Code: \(httpResponse.statusCode)")
-                    print("Response Headers: \(httpResponse.allHeaderFields)")
-                }
-                
-                if let responseString = String(data: data, encoding: .utf8) {
-                    print("Response Data: \(responseString)")
-                }
-                
-                guard let httpResponse = response as? HTTPURLResponse else {
-                    throw URLError(.badServerResponse)
-                }
-                
-                guard (200...299).contains(httpResponse.statusCode) else {
-                    print("Bad status code: \(httpResponse.statusCode)")
-                    throw URLError(.badServerResponse)
-                }
-                
-                return data
+        return networkService.dispatch(request)
+            .map { (response: GraphQLResponse) in
+                response.data.search.hits
             }
-            .decode(type: GraphQLResponse.self, decoder: JSONDecoder())
-            .map { $0.data.search.hits }
-            .print()
-            .receive(on: DispatchQueue.main)
             .eraseToAnyPublisher()
     }
 }
@@ -81,12 +63,12 @@ struct SearchResponse: Decodable {
     let hits: [Movie]
 }
 
-struct MovieKind: Decodable {
-    let name: String
-    let typename: String
-    
-    enum CodingKeys: String, CodingKey {
-        case name
-        case typename = "__typename"
-    }
-} 
+//struct MovieKind: Decodable {
+//    let name: String
+//    let typename: String
+//    
+//    enum CodingKeys: String, CodingKey {
+//        case name
+//        case typename = "__typename"
+//    }
+//} 

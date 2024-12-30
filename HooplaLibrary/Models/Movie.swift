@@ -2,15 +2,15 @@ struct Movie: Identifiable, Decodable {
     let id: String
     let artKey: String
     let title: String
-    let kind: MovieKind
-    let typename: String
+//    let kind: MovieKind
+//    let typename: String
     
     enum CodingKeys: String, CodingKey {
         case id
         case artKey
         case title
-        case kind
-        case typename = "__typename"
+//        case kind
+//        case typename = "__typename"
     }
     
     var thumbnailUrl: String {
