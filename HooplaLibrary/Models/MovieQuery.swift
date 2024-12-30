@@ -28,4 +28,35 @@ struct MovieQuery {
             ]
         ]
     ]
+    
+    static let movieDetail = """
+    query FETCH_TITLE_DETAIL($id: ID!, $includeDeleted: Boolean) {
+      title(criteria: {id: $id, includeDeleted: $includeDeleted}) {
+        id
+        artKey
+        title
+        synopsis
+        primaryArtist {
+          name
+        }
+        genres {
+          name
+        }
+        actors {
+          name
+        }
+        directors {
+          name
+        }
+        __typename
+      }
+    }
+    """
+    
+    static func detailVariables(for titleId: String) -> [String: Any] {
+        return [
+            "id": titleId,
+            "includeDeleted": false
+        ]
+    }
 } 

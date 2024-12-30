@@ -50,46 +50,49 @@ struct MovieGridItem: View {
     private let titleHeight: CGFloat = 60
     
     var body: some View {
-        VStack(spacing: 0) {
-            if let url = URL(string: movie.thumbnailUrl) {
-                AsyncImage(url: url) { phase in
-                    switch phase {
-                    case .empty:
-                        ProgressView()
-                            .frame(width: imageWidth, height: imageHeight)
-                    case .success(let image):
-                        image
-                            .resizable()
-                            .aspectRatio(contentMode: .fill)
-                            .frame(width: imageWidth, height: imageHeight)
-                            .clipped()
-                    case .failure(_):
-                        Image(systemName: "photo")
-                            .frame(width: imageWidth, height: imageHeight)
-                    @unknown default:
-                        EmptyView()
+        NavigationLink(destination: MovieDetailView(movie: movie)) {
+            VStack(spacing: 0) {
+                if let url = URL(string: movie.thumbnailUrl) {
+                    AsyncImage(url: url) { phase in
+                        switch phase {
+                        case .empty:
+                            ProgressView()
+                                .frame(width: imageWidth, height: imageHeight)
+                        case .success(let image):
+                            image
+                                .resizable()
+                                .aspectRatio(contentMode: .fill)
+                                .frame(width: imageWidth, height: imageHeight)
+                                .clipped()
+                        case .failure(_):
+                            Image(systemName: "photo")
+                                .frame(width: imageWidth, height: imageHeight)
+                        @unknown default:
+                            EmptyView()
+                        }
                     }
                 }
+                
+                Spacer(minLength: 0)
+                
+                HStack(alignment: .top) {
+                    Text(movie.title)
+                        .font(.title3)
+                        .fixedSize(horizontal: false, vertical: true)
+                        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
+                        .padding(.horizontal, 12)
+                        .padding(.vertical, 0)
+                        .lineLimit(2)
+                        .foregroundColor(.primary)
+                }
+                .frame(width: imageWidth, height: titleHeight)
+                .background(Color(.systemBackground))
             }
-            
-            Spacer(minLength: 0)
-            
-            HStack(alignment: .top) {
-                Text(movie.title)
-                    .font(.title3)
-                    .fixedSize(horizontal: false, vertical: true)
-                    .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
-                    .padding(.horizontal, 12)
-                    .padding(.vertical, 0)
-                    .lineLimit(2)
-            }
-            .frame(width: imageWidth, height: titleHeight)
+            .frame(width: imageWidth, height: itemHeight)
             .background(Color(.systemBackground))
+            .cornerRadius(8)
+            .shadow(radius: 2)
         }
-        .frame(width: imageWidth, height: itemHeight)
-        .background(Color(.systemBackground))
-        .cornerRadius(8)
-        .shadow(radius: 2)
     }
 }
 

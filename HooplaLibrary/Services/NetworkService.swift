@@ -7,6 +7,14 @@ struct NetworkService {
     func dispatch<T: Decodable>(_ request: URLRequest) -> AnyPublisher<T, Error> {
         URLSession.shared.dataTaskPublisher(for: request)
             .tryMap { data, response in
+                if let httpResponse = response as? HTTPURLResponse {
+                    print("Response status: \(httpResponse.statusCode)")
+                }
+                
+                if let jsonString = String(data: data, encoding: .utf8) {
+                    print("Response data: \(jsonString)")
+                }
+                
                 guard let httpResponse = response as? HTTPURLResponse else {
                     throw URLError(.badServerResponse)
                 }

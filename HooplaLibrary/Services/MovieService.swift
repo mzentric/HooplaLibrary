@@ -48,6 +48,41 @@ class MovieService: MovieServiceProtocol {
             }
             .eraseToAnyPublisher()
     }
+    
+    func fetchMovieDetail(id: String) -> AnyPublisher<MovieDetail, Error> {
+        guard let url = URL(string: baseURL) else {
+            return Fail(error: URLError(.badURL)).eraseToAnyPublisher()
+        }
+        
+        var request = URLRequest(url: url)
+        request.httpMethod = "POST"
+        
+        // Required headers
+        request.addValue("application/json", forHTTPHeaderField: "Content-Type")
+        request.addValue("*/*", forHTTPHeaderField: "Accept")
+        request.addValue("hoopla-www", forHTTPHeaderField: "apollographql-client-name")
+        request.addValue("4.113.0", forHTTPHeaderField: "apollographql-client-version")
+        request.addValue("https://www.hoopladigital.com", forHTTPHeaderField: "origin")
+        request.addValue("https://www.hoopladigital.com/", forHTTPHeaderField: "referer")
+        
+        let body: [String: Any] = [
+            "query": MovieQuery.movieDetail,
+            "variables": MovieQuery.detailVariables(for: id),
+            "operationName": "FETCH_TITLE_DETAIL"
+        ]
+        
+        do {
+            request.httpBody = try JSONSerialization.data(withJSONObject: body)
+        } catch {
+            return Fail(error: error).eraseToAnyPublisher()
+        }
+        
+        return networkService.dispatch(request)
+            .map { (response: DetailGraphQLResponse) in
+                response.data.title
+            }
+            .eraseToAnyPublisher()
+    }
 }
 
 // GraphQL response structures
@@ -72,3 +107,12 @@ struct SearchResponse: Decodable {
 //        case typename = "__typename"
 //    }
 //} 
+
+// Response structures for detail
+struct DetailGraphQLResponse: Decodable {
+    let data: DetailData
+}
+
+struct DetailData: Decodable {
+    let title: MovieDetail
+} 
