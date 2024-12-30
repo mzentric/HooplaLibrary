@@ -4,10 +4,22 @@ import Combine
 class MovieService: MovieServiceProtocol {
     private let baseURL = "https://patron-api-gateway.hoopladigital.com/graphql"
     
-    func fetchMovies() -> AnyPublisher<[Movie], Error> {
+    func fetchMovies(page: Int) -> AnyPublisher<[Movie], Error> {
+        let variables: [String: Any] = [
+            "criteria": [
+                "kindId": 7,
+                "popular": true,
+                "availability": "ALL_TITLES",
+                "pagination": [
+                    "page": page,
+                    "pageSize": 48
+                ]
+            ]
+        ]
+        
         let body: [String: Any] = [
             "query": MovieQuery.popularMovies,
-            "variables": MovieQuery.variables,
+            "variables": variables,
             "operationName": "FilterSearch"
         ]
         

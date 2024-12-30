@@ -17,18 +17,6 @@ struct MovieQuery {
     }
     """
     
-    static let variables: [String: Any] = [
-        "criteria": [
-            "kindId": 7,
-            "popular": true,
-            "availability": "ALL_TITLES",
-            "pagination": [
-                "page": 1,
-                "pageSize": 48
-            ]
-        ]
-    ]
-    
     static let movieDetail = """
     query FETCH_TITLE_DETAIL($id: ID!, $includeDeleted: Boolean) {
       title(criteria: {id: $id, includeDeleted: $includeDeleted}) {

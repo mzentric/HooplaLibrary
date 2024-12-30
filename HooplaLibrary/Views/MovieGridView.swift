@@ -12,14 +12,11 @@ struct MovieGridView: View {
     
     var body: some View {
         ScrollView {
-            if viewModel.isLoading {
-                ProgressView()
-                    .padding()
-            } else if let error = viewModel.error {
+            if viewModel.error != nil {
                 VStack {
                     Text("Error loading movies")
                         .foregroundColor(.red)
-                    Text(error.localizedDescription)
+                    Text(viewModel.error?.localizedDescription ?? "")
                         .font(.caption)
                         .foregroundColor(.gray)
                     Button("Retry") {
@@ -31,6 +28,14 @@ struct MovieGridView: View {
                 LazyVGrid(columns: gridColumns, spacing: 24) {
                     ForEach(viewModel.movies) { movie in
                         MovieGridItem(movie: movie)
+                            .onAppear {
+                                viewModel.loadMoreIfNeeded(currentItem: movie)
+                            }
+                    }
+                    
+                    if viewModel.isLoading {
+                        ProgressView()
+                            .gridCellColumns(gridColumns.count)
                     }
                 }
                 .padding()
