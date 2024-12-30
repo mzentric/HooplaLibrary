@@ -41,10 +41,11 @@ struct MovieDetailView: View {
                 }
                 .padding()
             } else {
-                // iPhone Layout (existing vertical layout)
+                // iPhone Layout
                 VStack(alignment: .leading, spacing: 16) {
                     contentView
                 }
+                .padding(.horizontal)
             }
         }
         .navigationBarTitleDisplayMode(.inline)
@@ -86,18 +87,21 @@ struct MovieDetailView: View {
             VStack(alignment: .leading, spacing: 12) {
                 Text(movie.title)
                     .font(.title)
+                    .padding(.horizontal)
                 
                 if let detail = viewModel.movieDetail {
                     Group {
                         Text("By \(detail.artist)")
                             .font(.subheadline)
                             .foregroundColor(.secondary)
+                            .padding(.horizontal)
                         
                         if !detail.synopsis.isEmpty {
                             Text(detail.synopsis)
                                 .font(.body)
                                 .foregroundColor(.secondary)
                                 .fixedSize(horizontal: false, vertical: true)
+                                .padding(.horizontal)
                         }
                         
                         HStack(spacing: 8) {
@@ -110,23 +114,32 @@ struct MovieDetailView: View {
                                     .cornerRadius(16)
                             }
                         }
+                        .padding(.horizontal)
                         
                         if !detail.directors.isEmpty {
-                            Text("Directors")
-                                .font(.headline)
-                                .padding(.top)
-                            Text(detail.directors.map(\.name).joined(separator: ", "))
-                                .font(.body)
-                                .foregroundColor(.secondary)
+                            VStack(alignment: .leading, spacing: 4) {
+                                Text("Directors")
+                                    .font(.headline)
+                                    .padding(.horizontal)
+                                Text(detail.directors.map(\.name).joined(separator: ", "))
+                                    .font(.body)
+                                    .foregroundColor(.secondary)
+                                    .padding(.horizontal)
+                            }
+                            .padding(.top)
                         }
                         
                         if !detail.actors.isEmpty {
-                            Text("Cast")
-                                .font(.headline)
-                                .padding(.top)
-                            Text(detail.actors.map(\.name).joined(separator: ", "))
-                                .font(.body)
-                                .foregroundColor(.secondary)
+                            VStack(alignment: .leading, spacing: 4) {
+                                Text("Cast")
+                                    .font(.headline)
+                                    .padding(.horizontal)
+                                Text(detail.actors.map(\.name).joined(separator: ", "))
+                                    .font(.body)
+                                    .foregroundColor(.secondary)
+                                    .padding(.horizontal)
+                            }
+                            .padding(.top)
                         }
                     }
                 }
@@ -145,6 +158,7 @@ struct MovieDetailView: View {
                     .cornerRadius(8)
                 }
                 .padding(.top)
+                .padding(.horizontal)
             }
         }
     }
